@@ -70,7 +70,7 @@ module.exports.deleteMovie = (req, res, next) => {
         throw new ForbidenError('Ошибка доступа');
       }
       return movie;
-    })
+    });
   Movie.findById(objectId)
     .then((movie) => {
       if (movie === null) {

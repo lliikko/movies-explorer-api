@@ -4,13 +4,13 @@ const NotFoundError = require('../errors/not-found');
 const ForbidenError = require('../errors/forbiden');
 
 module.exports.getMovies = (req, res, next) => {
-  Movie.find({ ...req.body, owner: req.user._id })
+  Movie.find({ owner: req.user._id })
     .then((movies) => {
       res.send(movies);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError());
+        next(new BadRequestError('Переданы некорректные данные'));
         return;
       }
       next(err);
@@ -50,7 +50,7 @@ module.exports.createMovie = (req, res, next) => {
     .then((movie) => res.send(movie))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError());
+        next(new BadRequestError('Переданы некорректные данные'));
         return;
       }
       next(err);
@@ -64,11 +64,21 @@ module.exports.deleteMovie = (req, res, next) => {
   Movie.findById(objectId)
     .then((movie) => {
       if (movie === null) {
+        throw new NotFoundError('Страница не найдена');
+      }
+      if (movie.owner.toString() !== ownerId) {
+        throw new ForbidenError('Ошибка доступа');
+      }
+      return movie;
+    })
+  Movie.findById(objectId)
+    .then((movie) => {
+      if (movie === null) {
         throw new NotFoundError();
       }
 
       if (movie.owner.toString() !== ownerId) {
-        throw new ForbidenError();
+        throw new ForbidenError('Ошибка доступа');
       }
 
       return movie;
@@ -76,12 +86,12 @@ module.exports.deleteMovie = (req, res, next) => {
     .then((movie) => {
       Movie.deleteOne(movie)
         .then(() => {
-          res.status(200).send({ message: 'delete' });
+          res.status(200).send('Удалено');
         });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError());
+        next(new BadRequestError('Переданы некорректные данные'));
         return;
       }
 

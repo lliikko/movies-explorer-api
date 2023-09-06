@@ -45,14 +45,11 @@ module.exports.createUser = (req, res, next) => {
           secure: true,
           SameSite: 'strict',
         })
-        .send({
-          token,
-          message: 'OK',
-        });
+        .send({ message: 'OK' });
     })
     .catch((err) => {
       if (err.code === 11000) {
-        next(new ConflictError('Пользователь уже зарегистрирован'));
+        next(new ConflictError('Пользователь с таким email уже существует'));
         return;
       }
       if (err.name === 'ValidationError') {
@@ -101,15 +98,19 @@ module.exports.updateUserInfo = (req, res, next) => {
     .orFail()
     .then((user) => {
       if (user) return res.status(200).send(user);
-      throw new NotFoundError('Пользователь не найден');
+      throw new NotFoundError('Страница не найдена');
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные'));
         return;
       }
+      if (err.code === 11000) {
+        next(new ConflictError('Пользователь с таким email уже существует'));
+        return;
+      }
       if (err.name === 'CastError') {
-        next(new NotFoundError('Пользователь не найден'));
+        next(new NotFoundError('Страница не найдена'));
         return;
       }
       next(err);

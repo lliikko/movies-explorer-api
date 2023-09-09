@@ -9,7 +9,6 @@ const routes = require('./routes');
 
 const limiter = require('./utils/limiter');
 const { host, port } = require('./utils/config');
-const NotFoundError = require('./errors/not-found');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT = port } = process.env;
@@ -26,10 +25,6 @@ app.use(requestLogger);
 app.use(limiter);
 
 app.use('/', routes);
-
-app.use((req, res, next) => {
-  next(new NotFoundError('Страницы не существует'));
-});
 
 app.use(errorLogger);
 app.use(errors());

@@ -23,22 +23,7 @@ mongoose.connect(host, {
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-const allowedCors = [
-  'https://angelikayang.nomoreparties.co/', 'http://angelikayang.nomoreparties.co/',
-  'http://localhost:3001',
-];
-
-app.use(cors());
-
-app.use((req, res, next) => {
-  const { origin } = req.headers;
-
-  if (allowedCors.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-  }
-
-  next();
-});
+app.use(cors({ origin: 'https://angelikayang.nomoreparties.co', credentials: true }));
 
 app.use(requestLogger);
 app.use(limiter);

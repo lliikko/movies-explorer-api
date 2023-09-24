@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 const helmet = require('helmet');
-const cors = require('cors');
+const cors = require('./middlewares/cors');
 const error = require('./middlewares/error');
 const routes = require('./routes');
 
@@ -23,7 +23,7 @@ mongoose.connect(host, {
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-app.use(cors({ origin: 'https://angelikayang.nomoreparties.co', credentials: true }));
+app.use(cors);
 
 app.use(requestLogger);
 app.use(limiter);
